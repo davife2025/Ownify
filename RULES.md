@@ -8,7 +8,7 @@ Buyer agents, each representing one user, want GPU hours. They pool their demand
 
 ## 2. Actors and accounts
 
-- **Parent:** `swarm.testnet`. Creates every agent sub-account. Agents never hold the parent's keys.
+- **Parent:** `swarm.testnet` is the example name; the real parent is set in config, because that name may already be taken on testnet. Creates every agent sub-account. Agents never hold the parent's keys.
 - **Coordinator:** `coordinator.swarm.testnet`. Opens rounds, collects commitments, checks reveals, clears, records results.
 - **Buyers:** `buyer-1.swarm.testnet` and up. One agent per user.
 - **Sellers:** `seller-1.swarm.testnet` and up.

@@ -1,3 +1,5 @@
+export * from "./agents";
+
 export const APP_NAME = "Ownify";
 
 export interface HealthResponse {
