@@ -1,3 +1,31 @@
+# Session map
+
+1. **Core infrastructure** (done): monorepo, workspaces, shared types, API with health route, web shell, Supabase scaffolding.
+2. **Landing and onboarding** (done): ticker strip, hero, onboarding cards, docs and API sidebar.
+3. **Swarm rules** (draft written, waiting for OK): RULES.md and a text sequence diagram of one round. No contracts until approved.
+4. **Agent identity and wallets**: one sub-account per agent under a parent, wired to the Agent API with owner-signed spending rules.
+5. **Coordinator and simulation**: open a round, sealed bids, reveal, clear; 20 scripted buyers and 5 sellers, no LLM calls.
+6. **Live dashboard**: rounds, bids, clearing price and who got what; feeds the ticker.
+7. **Verified agent shelf**: housing, study and food agents on Kimi K2 via Hugging Face, with benchmark scores.
+8. **Cost dial and receipts**: model, compute and energy settings, a live price, a receipt per task.
+9. **Data vault** (stretch): private vault and a labelled testnet sale listing.
+10. **Submission pack**: README, final RULES.md, demo video, X post and form.
+
+---
+
+# Session 3: Swarm rules (in progress)
+
+**Overview:** RULES.md with the round phases, a clearing algorithm with a worked example, edge cases, simulation and live-page requirements, and a text sequence diagram of one round.
+
+## Built
+- `RULES.md` (draft). No code, no contracts.
+
+## Waiting on Dave
+- OK on RULES.md, and answers to the five decisions in its section 11, before any contract or coordinator code
+- Assumption made: Ownify enters the AI Swarms track, as the pasted NEAR prompt is for that track
+
+---
+
 # Session 2: Landing and onboarding
 
 **Overview:** the real landing page in `apps/web`: a live round ticker strip, hero, three onboarding cards, and a docs and API area with a left sidebar.
