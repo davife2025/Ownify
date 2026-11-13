@@ -4,7 +4,7 @@ Verified AI agents you own: you choose what they run on, what each task costs, a
 
 ## Status
 
-Sessions 1 (core infrastructure), 2 (landing and onboarding) and 4 (agent identity) are done; Session 3 (RULES.md) is a draft awaiting review. The agent shelf, cost dial, swarm rounds and data vault are not built yet; see `SESSION_REPORT.md` for what exists and what comes next.
+Sessions 1 (core infrastructure), 2 (landing and onboarding) 4 (agent identity) and 5 (coordinator and simulation) are done; Session 3 (RULES.md) is a draft awaiting review. The agent shelf, cost dial, swarm rounds and data vault are not built yet; see `SESSION_REPORT.md` for what exists and what comes next.
 
 ## Stack
 
@@ -27,6 +27,9 @@ curl http://localhost:4000/health
 curl -X POST http://localhost:4000/swarm/agents -H "content-type: application/json" -d '{}'   # 20 buyers, 5 sellers
 curl http://localhost:4000/swarm/agents
 curl http://localhost:4000/swarm/agents/buyer-1.swarm.testnet/policy    # needs SETTLEMENT_ASSET_ID
+curl -X POST http://localhost:4000/swarm/simulate -H "content-type: application/json" -d '{"seed":1,"rounds":3}'
+curl http://localhost:4000/swarm/runs/run-1/events?limit=20
+pnpm --filter @ownify/api simulate -- --seed 1 --rounds 3     # prints a round-by-round summary
 pnpm --filter @ownify/api test
 ```
 

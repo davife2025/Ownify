@@ -6,6 +6,8 @@ import type { Provisioner } from "./agents/provisioner";
 import type { AgentStore } from "./agents/store";
 import { provisionSwarm } from "./agents/swarm";
 import { buildBuyerPolicy, buildSellerPolicy } from "./agents/policy";
+import { RunStore } from "./swarm/runs";
+import { registerSwarmRoutes } from "./swarm/routes";
 
 export interface AppDeps {
   provisioner: Provisioner;
@@ -18,6 +20,7 @@ export interface AppDeps {
     dailyUsd: string;
     payout?: { chain: string; address: string };
   };
+  runs?: RunStore;
   logger?: boolean;
 }
 
@@ -75,6 +78,8 @@ export async function buildApp(deps: AppDeps) {
       policy,
     };
   });
+
+  registerSwarmRoutes(app, { runs: deps.runs ?? new RunStore(), parent: deps.parent });
 
   return app;
 }

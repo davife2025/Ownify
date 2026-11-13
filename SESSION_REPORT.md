@@ -4,12 +4,45 @@
 2. **Landing and onboarding** (done): ticker strip, hero, onboarding cards, docs and API sidebar.
 3. **Swarm rules** (draft written; treated as approved with the recommended defaults): RULES.md and a text sequence diagram of one round. No contracts yet.
 4. **Agent identity and wallets** (done, with gaps below): one sub-account per agent under a parent, plus the owner-signed spending rules for each agent.
-5. **Coordinator and simulation** (next): open a round, sealed bids, reveal, clear; 20 scripted buyers and 5 sellers, no LLM calls.
-6. **Live dashboard**: rounds, bids, clearing price and who got what; feeds the ticker.
+5. **Coordinator and simulation** (done, service only; the NEAR contract is not written): open a round, sealed bids, reveal, clear; 20 scripted buyers and 5 sellers, no LLM calls.
+6. **Live dashboard** (next): rounds, bids, clearing price and who got what; feeds the ticker.
 7. **Verified agent shelf**: housing, study and food agents on Kimi K2 via Hugging Face, with benchmark scores.
 8. **Cost dial and receipts**: model, compute and energy settings, a live price, a receipt per task.
 9. **Data vault** (stretch): private vault and a labelled testnet sale listing.
 10. **Submission pack**: README, final RULES.md, demo video, X post and form.
+
+---
+
+# Session 5: Coordinator and simulation
+
+**Overview:** the round rules from RULES.md as running code, plus a market of 20 scripted buyers and 5 scripted sellers that runs without any LLM.
+
+## Built (all in `apps/api/src/swarm/`)
+- `clearing.ts`: the clearing algorithm, pure and deterministic, with the tie rules
+- `round.ts`: a round state machine (open, demand, locked, bid, reveal, cleared, settled, closed). It checks phase order, one demand per buyer, hours and price limits, balance at lock, and sealed bids by sha256 commit and reveal. Bad or missing reveals are voided. Max prices and unrevealed offers stay hidden in `publicView()`.
+- `ledger.ts`: integer balances; settlement moves each buyer's share to the winner, and a buyer who cannot pay is flagged while the others still pay
+- `simulation.ts`: seeded random generator; buyer scripts (truthful, shaded, late joiner, size shifter, plus buyers who cannot cover their demand); seller scripts (cost plus, undercut, high hold, random walk, plus one seller that sometimes skips its reveal)
+- Event feed with sequence numbers, ready for the ticker
+- Routes: `POST /swarm/simulate`, `GET /swarm/runs`, `GET /swarm/runs/:id`, `GET /swarm/runs/:id/rounds/:n`, `GET /swarm/runs/:id/events?after=`
+- CLI: `pnpm --filter @ownify/api simulate -- --seed 1 --rounds 3`
+- RULES.md now states the commitment encoding
+
+## Verified (run in this session)
+- `pnpm build` 3 of 3, `pnpm typecheck` 4 of 4, 28 of 28 tests pass
+- The worked example in RULES.md clears exactly as written (winner A, price 5, buyers pay 50 and 100)
+- Across 40 seeds, 4 rounds each: money is conserved, no buyer pays above its max, no cheaper eligible offer lost, payout equals the sum of shares
+- The same seed gives the identical market; a test checks the swarm code has no network or LLM calls
+- Built server: simulated and served rounds and events over HTTP
+
+## Not built or not verified
+- No NEAR contract. Sealed bids are committed to the service, not to the chain, until you approve the contract.
+- Settlement is a ledger in memory, not NEAR Intents
+- Runs live in memory and are lost on restart; Supabase persistence comes with the dashboard
+- Live (non-simulated) rounds with real agents are not wired: the engine takes bids from code only
+
+## Needed from Dave
+- OK to write the minimal NEAR contract (records commitments, reveals and results, holds no money), or confirm service-only
+- Everything listed under Session 4 still applies for real accounts and settlement
 
 ---
 

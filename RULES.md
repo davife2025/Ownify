@@ -36,6 +36,8 @@ Buyer agents, each representing one user, want GPU hours. They pool their demand
 
 Deadlines are configurable. Simulation mode advances phases immediately.
 
+**Commitment encoding:** `sha256` (hex) of the UTF-8 string `price|capacity|salt`, with price and capacity as plain decimal integers and the salt at least 8 characters.
+
 ## 5. Clearing algorithm
 
 An offer is `(price per GPU-hour, capacity in GPU-hours)`.
