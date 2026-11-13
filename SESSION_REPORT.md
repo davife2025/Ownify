@@ -6,10 +6,45 @@
 4. **Agent identity and wallets** (done, with gaps below): one sub-account per agent under a parent, plus the owner-signed spending rules for each agent.
 5. **Coordinator and simulation** (done, service only; the NEAR contract is not written): open a round, sealed bids, reveal, clear; 20 scripted buyers and 5 sellers, no LLM calls.
 6. **Live dashboard** (done, not yet seen in a browser): rounds, bids, clearing price and who got what; feeds the ticker.
-7. **Verified agent shelf** (next): housing, study and food agents on Kimi K2 via Hugging Face, with benchmark scores.
+7. **Verified agent shelf** (done; never run against the real model): housing, study and food agents on Kimi K2 via Hugging Face, with benchmark scores.
 8. **Cost dial and receipts**: model, compute and energy settings, a live price, a receipt per task.
 9. **Data vault** (stretch): private vault and a labelled testnet sale listing.
 10. **Submission pack**: README, final RULES.md, demo video, X post and form.
+
+---
+
+# Session 7: Verified agent shelf
+
+**Overview:** housing, study and food agents, a scoring pipeline that tests each one on questions with known answers at three cost tiers, a receipt for every score, and a shelf page where people can ask an agent a question. Rules are written up in `VERIFICATION.md`.
+
+## Built
+- `apps/api/src/shelf/`: agent definitions and system prompts; hidden banks of 10 questions per agent; a deterministic rubric scorer (expected facts, forbidden claims, required referral); seeded case selection that always includes the referral cases and rotates the rest; sha256 receipts; a file-based score store; the Hugging Face client (`https://router.huggingface.co/v1/chat/completions`, `moonshotai/Kimi-K2-Instruct` by default, both from Hugging Face's own docs); a labelled mock used when no token is set; a shared rate limit on questions
+- Routes: `GET /shelf`, `POST /shelf/:agent/ask`, `GET /shelf/:agent/receipt/:tier`
+- CLI: `pnpm verify` runs the benchmark and writes `apps/api/data/shelf-scores.json`; it refuses to run on the mock unless `--allow-mock`
+- Web: `/agents` with an agent card per domain (scores by tier, safe behavior, status) and an ask form with an answer-budget choice; "Agent shelf" added to the top bar, sidebar and docs cards
+- Status wording on the page: Not scored yet, Sample only (mock model), Verified, or Not verified with the reason
+
+## Verified (run in this session)
+- `pnpm build` 3 of 3, `pnpm typecheck` 4 of 4, 47 of 47 API tests
+- All 30 questions and every pattern compile; scoring rewards known facts, caps a missing referral at half marks, and zeroes a forbidden claim; selection always includes referral cases and every question gets asked across seeds; receipts change when any field changes and recompute correctly
+- The Hugging Face client sends the documented request (URL, bearer token, model, messages, max tokens) and handles errors, empty answers and network failure, tested against a fake fetch
+- Built servers: `/shelf` lists 3 agents x 3 tiers with no scores, the hidden bank is not in any response, asking works in mock mode, a bad tier is rejected, the CORS preflight for the ask form passes, `/agents` returns 200
+- The CLI refuses to run without a token; with `--allow-mock` it stores flagged sample scores
+- Server render of the shelf shows all five status wordings
+
+## Not verified
+- **No call to the real Hugging Face API has ever been made.** There is no token and this sandbox cannot reach it. The client is checked only against the documented request and response shape.
+- **No agent has a real score.** The shelf shows "Not scored yet" until you run `pnpm verify` with a token. The 54 calls are your Hugging Face usage.
+- The expected answers and patterns were written by me and not reviewed by anyone else; skim `apps/api/src/shelf/banks/` before relying on them
+- The shelf page was server-rendered but never opened in a browser
+- Scores are in a JSON file, not Supabase
+
+## Decisions and needs
+- A Hugging Face fine-grained token (permission to make calls to Inference Providers) to run `pnpm verify` and to make `/agents` answer for real
+- Model: the router also lists a newer `moonshotai/Kimi-K2.5`. The default stays `moonshotai/Kimi-K2-Instruct`; change `HF_MODEL` if you prefer the newer one.
+- Tiers are the same model with a smaller or larger answer budget, because the build rule allows only Kimi K2. For Session 8, the cost dial's "model" setting would therefore be the answer budget, not a choice of models, unless you allow other models.
+- For a hosted demo: run `pnpm verify` locally and commit `apps/api/data/shelf-scores.json`; the API also needs somewhere to run
+- Still open: the NEAR contract (assumed service-only), and everything under Sessions 4 and 5 for real accounts and settlement
 
 ---
 

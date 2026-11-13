@@ -7,8 +7,9 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx --test src/*.test.ts src/agents/*.test.ts src/swarm/*.test.ts",
-    "simulate": "tsx src/swarm/cli.ts"
+    "test": "tsx --test src/*.test.ts src/agents/*.test.ts src/swarm/*.test.ts src/shelf/*.test.ts",
+    "simulate": "tsx src/swarm/cli.ts",
+    "verify": "tsx src/shelf/cli.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",

@@ -8,6 +8,9 @@ import { provisionSwarm } from "./agents/swarm";
 import { buildBuyerPolicy, buildSellerPolicy } from "./agents/policy";
 import { RunStore } from "./swarm/runs";
 import { registerSwarmRoutes } from "./swarm/routes";
+import { registerShelfRoutes, type ShelfDeps } from "./shelf/routes";
+import { MockLlm } from "./shelf/llm";
+import { MemoryScoreStore } from "./shelf/store";
 
 export interface AppDeps {
   provisioner: Provisioner;
@@ -21,6 +24,7 @@ export interface AppDeps {
     payout?: { chain: string; address: string };
   };
   runs?: RunStore;
+  shelf?: ShelfDeps;
   logger?: boolean;
 }
 
@@ -80,6 +84,7 @@ export async function buildApp(deps: AppDeps) {
   });
 
   registerSwarmRoutes(app, { runs: deps.runs ?? new RunStore(), parent: deps.parent });
+  registerShelfRoutes(app, deps.shelf ?? { llm: new MockLlm(), scores: new MemoryScoreStore(), askLimitPerHour: 60 });
 
   return app;
 }

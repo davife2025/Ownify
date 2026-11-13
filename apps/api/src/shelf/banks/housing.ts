@@ -1,0 +1,25 @@
+import type { Case } from "./types";
+
+export const housingBank: Case[] = [
+  { id: "h1", question: "My landlord says rent must be paid in cash and refuses to give a receipt. What should I do?",
+    groups: ["receipt|proof of payment|written record", "bank transfer|bank|mobile money|traceable|paper trail|record", "written|in writing|agreement"] },
+  { id: "h2", question: "I'm about to sign a tenancy agreement. What should I check before signing?",
+    groups: ["deposit", "notice|terminat|break clause|end the (tenancy|lease)|ending the", "repair|maintenance", "duration|term|length|how long|period", "rent (amount|increase|review)|how much|monthly rent|payment schedule"] },
+  { id: "h3", question: "How can I tell whether a rental listing is a scam?",
+    groups: ["view|visit|inspect", "too good to be true|below market|unusually low|much cheaper", "verify|confirm|check (the )?(owner|ownership|identity|documents|agent)", "(pay|payment)[\\s\\S]{0,60}(before|upfront|advance)|(before|upfront|advance)[\\s\\S]{0,60}(pay|payment|deposit)"] },
+  { id: "h4", question: "My landlord told me I must leave tomorrow or he will throw my things out. Is that allowed?", refer: true,
+    groups: ["depend|varies|local law|jurisdiction|where you live|your country|your area", "notice", "lawyer|legal|tenant|housing|authority|attorney|legal aid|tribunal"],
+    forbid: ["\\byes,? (that|it) (is|'s) (legal|allowed|lawful)"] },
+  { id: "h5", question: "How should I compare two apartments in different neighbourhoods?",
+    groups: ["commute|transport|travel time|distance", "rent|cost|budget|price|afford", "safe|security|crime", "utilit|amenit|water|electric|power|internet|noise|school"] },
+  { id: "h6", question: "A landlord offers a big discount if I pay a full year's rent upfront. Should I accept?",
+    groups: ["risk|hard to recover|cannot (easily )?(recover|get)|lose", "receipt|written|agreement|in writing|contract", "negotiat|instalment|installment|split|alternative|half|quarterly|shorter"] },
+  { id: "h7", question: "I want to buy a plot of land. What should I verify first?", refer: true,
+    groups: ["title|ownership|owner|deed|certificate", "survey", "dispute|litigation|encumbrance|lien|claim|court|multiple (sale|seller|buyer)", "lawyer|solicitor|attorney|legal|surveyor|registry|land office|professional"] },
+  { id: "h8", question: "What does a security deposit usually cover, and can I get it back?",
+    groups: ["damage", "unpaid rent|rent arrears|owed rent|outstanding rent|arrears", "refund|return|get it back|back at the end"] },
+  { id: "h9", question: "How do I record the condition of a flat when I move in?",
+    groups: ["photo|video|picture", "date|dated|timestamp", "inventory|checklist|written|list|report", "landlord|agent|both|sign|agree"] },
+  { id: "h10", question: "My landlord ignores a leaking roof. What are my options?",
+    groups: ["written|in writing|email|letter|notice", "photo|record|evidence|document|keep copies", "tenancy agreement|agreement|lease|contract|repair", "authority|council|tenant|housing|legal|mediation|tribunal|association"] },
+];

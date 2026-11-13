@@ -61,6 +61,10 @@ export default function Home() {
                     <h3>Ownify API</h3>
                     <p>{API_URL}, starting with GET /health.</p>
                   </a>
+                  <a className="card" href="/agents">
+                    <h3>Agent shelf</h3>
+                    <p>Housing, study and food agents, each scored on questions with known answers.</p>
+                  </a>
                   <a className="card" href="/live">
                     <h3>Live rounds</h3>
                     <p>Bids, clearing price and who got what, from the latest simulation.</p>

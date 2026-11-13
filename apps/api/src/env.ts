@@ -22,6 +22,13 @@ const schema = z.object({
   AGENT_DAILY_USD_BUDGET: z.preprocess(blank, z.string().regex(/^\d+(\.\d{1,2})?$/).default("5.00")),
   SELLER_PAYOUT_CHAIN: optStr,
   SELLER_PAYOUT_ADDRESS: optStr,
+
+  LLM_PROVIDER: z.preprocess(blank, z.enum(["huggingface", "mock"]).optional()),
+  HF_TOKEN: optStr,
+  HF_MODEL: z.preprocess(blank, z.string().default("moonshotai/Kimi-K2-Instruct")),
+  HF_BASE_URL: z.preprocess(blank, z.string().url().default("https://router.huggingface.co/v1")),
+  SCORES_FILE: z.preprocess(blank, z.string().default("data/shelf-scores.json")),
+  ASK_LIMIT_PER_HOUR: z.preprocess(blank, z.coerce.number().int().min(1).default(60)),
 });
 
 export const env = schema.parse(process.env);

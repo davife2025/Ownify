@@ -1,5 +1,6 @@
 export * from "./agents";
 export * from "./swarm";
+export * from "./shelf";
 export * from "./format";
 export * from "./describe";
 export * from "./replay";

@@ -5,6 +5,7 @@ export function TopBar() {
       <nav className="topnav" aria-label="Primary">
         <a href="/#start">Start here</a>
         <a href="/#docs">Docs and API</a>
+        <a href="/agents">Agent shelf</a>
         <a href="/live">Live rounds</a>
       </nav>
     </div>

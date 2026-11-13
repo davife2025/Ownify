@@ -4,6 +4,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { reduceRoundEvents, shortId, usd } from "@ownify/shared";
 import { runSimulation } from "../../api/src/swarm/simulation";
 import { RoundPanels } from "../src/components/live/RoundPanels";
+import { ShelfCards } from "../src/components/shelf/ShelfCards";
+import { TIERS, TIER_IDS, type ShelfResponse, type TierScore } from "@ownify/shared";
 
 const run = runSimulation({ seed: 1, rounds: 3, buyers: 20, sellers: 5, parent: "swarm.testnet" });
 const record = run.rounds[1];
@@ -31,4 +33,22 @@ const empty = renderToStaticMarkup(<RoundPanels view={reduceRoundEvents([])} rec
 assert.ok(empty.includes("Waiting for the round to clear"));
 assert.ok(empty.includes("Press replay"));
 
-console.log(`ssr-check ok: round 2 cleared at ${usd(res.price)}/h by ${shortId(res.winner)}, ${res.allocations.length} buyers, ${full.length} bytes of markup`);
+// Agent shelf: every status wording, with fixture scores (rendering test only, not real results).
+const base: TierScore = { score: 82, casesRun: 6, safetyPassed: 2, safetyTotal: 2, unsafe: 0, provider: "huggingface", model: "moonshotai/Kimi-K2-Instruct", real: true, verified: true, seed: 1, scoredAt: "2026-11-13T00:00:00Z", receipt: "a".repeat(64) };
+const shelf: ShelfResponse = {
+  provider: "mock", model: "mock", verifiedMin: 70,
+  agents: ["housing", "study", "food"].map((id, i) => ({
+    id: id as "housing", name: `${id} agent`, summary: `About ${id}.`, safeBehavior: `Refers on ${id}.`,
+    tiers: TIER_IDS.map((tier, j) => ({
+      tier, label: TIERS[tier].label, maxTokens: TIERS[tier].maxTokens,
+      score: i === 0 ? null : i === 1 ? (j === 0 ? { ...base, real: false, verified: false } : j === 1 ? base : { ...base, score: 60, verified: false }) : { ...base, unsafe: 1, verified: false },
+    })),
+  })),
+};
+const shelfHtml = renderToStaticMarkup(<ShelfCards shelf={shelf} selected="study" />);
+for (const must of ["Not scored yet", "Sample only (mock model)", "Verified", "Not verified: below 70", "Not verified: an unsafe answer", "82/100", "2 of 2", "Asking this agent", "Ask this agent", "Safe behavior"]) {
+  assert.ok(shelfHtml.includes(must), `shelf render should include "${must}"`);
+}
+assert.equal(/undefined|NaN|\[object/.test(shelfHtml), false);
+
+console.log(`ssr-check ok: round 2 cleared at ${usd(res.price)}/h by ${shortId(res.winner)}, ${res.allocations.length} buyers, ${full.length} bytes of markup, shelf cards render all five statuses`);

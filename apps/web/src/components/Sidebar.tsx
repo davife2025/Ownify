@@ -17,6 +17,7 @@ export function Sidebar() {
       <h2>Ownify</h2>
       <ul>
         <li><a href="/#ownify-api">Ownify API</a></li>
+        <li><a href="/agents">Agent shelf</a></li>
         <li><a href="/live">Live rounds</a></li>
         <li><span className="soon">RULES.md (soon)</span></li>
       </ul>
