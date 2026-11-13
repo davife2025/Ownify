@@ -4,7 +4,7 @@ Verified AI agents you own: you choose what they run on, what each task costs, a
 
 ## Status
 
-Session 1 (core infrastructure) is done. The product features are not built yet; see `SESSION_REPORT.md` for what exists and what comes next.
+Sessions 1 (core infrastructure) and 2 (landing and onboarding) are done. The agent shelf, cost dial, swarm rounds and data vault are not built yet; see `SESSION_REPORT.md` for what exists and what comes next.
 
 ## Stack
 
