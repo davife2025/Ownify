@@ -3,24 +3,10 @@ import { commitmentOf } from "./commit";
 import { RuleError } from "./errors";
 import type { Ledger } from "./ledger";
 import type { ClearResult, Demand, Emit, Offer, RoundParams } from "./types";
+import { PHASES, type Phase, type RoundRecord, type Settlement } from "@ownify/shared";
 
-export const PHASES = ["open", "demand", "locked", "bid", "reveal", "cleared", "settled", "closed"] as const;
-export type Phase = (typeof PHASES)[number];
-
-export interface Settlement { from: string; to: string; amount: number }
-export interface RoundRecord {
-  id: string;
-  index: number;
-  params: RoundParams;
-  phase: Phase;
-  demands: Demand[];
-  voidedDemands: { buyerId: string; reason: string }[];
-  offers: Offer[];
-  voidedOffers: { sellerId: string; reason: string }[];
-  result: ClearResult | null;
-  settlements: Settlement[];
-  defaults: string[];
-}
+export { PHASES };
+export type { Phase, RoundRecord, Settlement };
 
 export interface RoundDeps { id: string; index: number; params: RoundParams; ledger: Ledger; emit: Emit }
 

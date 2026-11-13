@@ -4,7 +4,7 @@ Verified AI agents you own: you choose what they run on, what each task costs, a
 
 ## Status
 
-Sessions 1 (core infrastructure), 2 (landing and onboarding) 4 (agent identity) and 5 (coordinator and simulation) are done; Session 3 (RULES.md) is a draft awaiting review. The agent shelf, cost dial, swarm rounds and data vault are not built yet; see `SESSION_REPORT.md` for what exists and what comes next.
+Sessions 1 (core infrastructure), 2 (landing and onboarding) 4 (agent identity) and 5 (coordinator and simulation) and 6 (live dashboard) are done; Session 3 (RULES.md) is a draft awaiting review. The agent shelf, cost dial, swarm rounds and data vault are not built yet; see `SESSION_REPORT.md` for what exists and what comes next.
 
 ## Stack
 
@@ -17,7 +17,7 @@ pnpm install
 cp .env.example .env     # fill in values as sessions need them
 pnpm build
 pnpm typecheck
-pnpm dev                 # web on :3000, api on :4000
+pnpm dev                 # web on :3000, api on :4000; open http://localhost:3000/live
 ```
 
 API checks:
@@ -31,6 +31,7 @@ curl -X POST http://localhost:4000/swarm/simulate -H "content-type: application/
 curl http://localhost:4000/swarm/runs/run-1/events?limit=20
 pnpm --filter @ownify/api simulate -- --seed 1 --rounds 3     # prints a round-by-round summary
 pnpm --filter @ownify/api test
+pnpm --filter @ownify/web check:ssr                              # renders the dashboard panels from a real simulation
 ```
 
 ## Notes

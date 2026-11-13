@@ -1,19 +1,14 @@
 import { Sidebar } from "../components/Sidebar";
 import { Ticker } from "../components/Ticker";
+import { TopBar } from "../components/TopBar";
+import { sampleRoundEvents } from "../content/sample-events";
 import { API_URL, nearDocs, steps } from "../content/links";
 
 export default function Home() {
   return (
     <>
-      <div className="wrap topbar">
-        <a className="brand" href="#top">Ownify</a>
-        <nav className="topnav" aria-label="Primary">
-          <a href="#start">Start here</a>
-          <a href="#docs">Docs and API</a>
-        </nav>
-      </div>
-
-      <Ticker />
+      <TopBar />
+      <Ticker sample={sampleRoundEvents} />
 
       <main id="top">
         <div className="wrap">
@@ -25,7 +20,7 @@ export default function Home() {
             </p>
             <div className="actions">
               <a className="btn btn-primary" href="#start">Get started</a>
-              <a className="btn btn-ghost" href="#docs">Read the docs</a>
+              <a className="btn btn-ghost" href="/live">Watch a live round</a>
             </div>
           </header>
 
@@ -66,13 +61,13 @@ export default function Home() {
                     <h3>Ownify API</h3>
                     <p>{API_URL}, starting with GET /health.</p>
                   </a>
+                  <a className="card" href="/live">
+                    <h3>Live rounds</h3>
+                    <p>Bids, clearing price and who got what, from the latest simulation.</p>
+                  </a>
                   <div className="card card-soon">
                     <h3>RULES.md</h3>
-                    <p>How a group-buying round works. Arrives with the swarm rules.</p>
-                  </div>
-                  <div className="card card-soon">
-                    <h3>Live rounds</h3>
-                    <p>Bids, clearing price and who got what. Arrives with the dashboard.</p>
+                    <p>How a group-buying round works. Arrives with the submission pack.</p>
                   </div>
                 </div>
               </section>

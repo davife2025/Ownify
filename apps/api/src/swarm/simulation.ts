@@ -1,4 +1,4 @@
-import { agentAccountId } from "@ownify/shared";
+import { agentAccountId, type RoundSummary, type SimConfig } from "@ownify/shared";
 import { commitmentOf } from "./commit";
 import { Ledger } from "./ledger";
 import { makeRng } from "./rng";
@@ -9,21 +9,7 @@ import { DEFAULT_PARAMS, type EventType, type RoundParams, type SwarmEvent } fro
 const BUYER_STRATEGIES = ["truthful", "shaded", "lateJoiner", "sizeShifter"] as const;
 const SELLER_STRATEGIES = ["costPlus", "undercut", "highHold", "randomWalk"] as const;
 
-export interface SimConfig { seed: number; rounds: number; buyers: number; sellers: number; parent: string }
-
-export interface RoundSummary {
-  round: number;
-  status: "cleared" | "failed";
-  winner?: string;
-  price?: number;
-  buyers?: number;
-  poolHours?: number;
-  payout?: number;
-  reason?: string;
-  voidedDemands: number;
-  voidedOffers: number;
-  defaults: number;
-}
+export type { RoundSummary, SimConfig };
 
 export interface SimRun {
   seed: number;
@@ -85,6 +71,9 @@ export function runSimulation(cfg: SimConfig): SimRun {
   for (let r = 1; r <= cfg.rounds; r++) {
     const emit = (type: EventType, data: Record<string, unknown>) => events.push({ seq: events.length + 1, round: r, type, data });
     const round = new Round({ id: `round-${r}`, index: r, params, ledger, emit });
+
+    // Seller costs drift a little each round (think energy prices), so clearing prices move.
+    if (r > 1) for (const s of sellers) s.cost = clamp(Math.round(s.cost * (1 + (rng.next() - 0.5) * 0.08)), 1_200_000, 3_500_000);
 
     round.startDemand();
     for (const b of buyers) {

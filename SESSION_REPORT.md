@@ -5,11 +5,46 @@
 3. **Swarm rules** (draft written; treated as approved with the recommended defaults): RULES.md and a text sequence diagram of one round. No contracts yet.
 4. **Agent identity and wallets** (done, with gaps below): one sub-account per agent under a parent, plus the owner-signed spending rules for each agent.
 5. **Coordinator and simulation** (done, service only; the NEAR contract is not written): open a round, sealed bids, reveal, clear; 20 scripted buyers and 5 sellers, no LLM calls.
-6. **Live dashboard** (next): rounds, bids, clearing price and who got what; feeds the ticker.
-7. **Verified agent shelf**: housing, study and food agents on Kimi K2 via Hugging Face, with benchmark scores.
+6. **Live dashboard** (done, not yet seen in a browser): rounds, bids, clearing price and who got what; feeds the ticker.
+7. **Verified agent shelf** (next): housing, study and food agents on Kimi K2 via Hugging Face, with benchmark scores.
 8. **Cost dial and receipts**: model, compute and energy settings, a live price, a receipt per task.
 9. **Data vault** (stretch): private vault and a labelled testnet sale listing.
 10. **Submission pack**: README, final RULES.md, demo video, X post and form.
+
+---
+
+# Session 6: Live dashboard
+
+**Overview:** a `/live` page that shows rounds, sealed bids, the clearing price and who got what, a replay that plays a round back event by event, and a landing-page ticker that reads the latest simulation.
+
+## Built
+- `packages/shared`: the swarm types moved here so the API and web app share one definition, plus `usd` and `shortId` formatters, `describeEvent` (one plain sentence per event) and `reduceRoundEvents` (rebuilds a round's public state from its events, with no hidden max prices)
+- `apps/web` `/live`: run controls (seed, rounds), a rounds list, a phase stepper, panels for pool, sealed bids (revealed offers with the winner marked, void offers with reasons), result, who got what, left out, settlement and an event feed; "Replay this round" and "Show the result"; screen-reader announcements during replay
+- If the API has no runs yet, `/live` creates one (seed 2026, 5 rounds). Error state explains how to start the API.
+- Landing page: the ticker shows the latest simulation's last round, and falls back to the labelled sample if there is none or the API is offline. "Live rounds" is now linked from the top bar, sidebar, hero and cards.
+- API: the run store keeps the latest 50 runs
+- Simulation: seller costs drift a little each round (think energy prices)
+- `pnpm --filter @ownify/web check:ssr`
+
+## Verified (run in this session)
+- `pnpm build` 3 of 3, `pnpm typecheck` 4 of 4, 33 of 33 API tests
+- Replaying a round's public events rebuilds the stored round record exactly (offers, void reasons, result, settlements, defaults), across several seeds
+- Server render of the dashboard panels from real simulation output: full round, a partial replay before the pool locks (no result shown early), and an empty state
+- Built API and web servers together: the API allows the web origin (CORS), `/` and `/live` return 200 with the expected content, and the runs and events the dashboard loads come back
+- Found and fixed a flaw: with fixed seller costs the clearing price was identical in every round. After the drift change, seed 2026 clears at $2.93, $3.03, $3.14, $3.04, $3.15 per GPU-hour.
+
+## Not verified
+- No browser was available, so the client side was never exercised: data fetching in the page, the replay timer, button clicks, layout, colors and mobile. Open `/live` and check it.
+- The ticker's switch from sample to live lines is the same: only its server render was checked
+- Runs live in memory and reset when the API restarts; there is no Supabase storage yet
+- Rounds still come only from the simulation, not from real agents
+- The earlier preview artifact still shows the teal accent and stat cells; the real pages supersede it
+
+## Needed from Dave
+- Run `pnpm dev`, open `/live`, and tell me what looks or behaves wrong
+- For a hosted demo the API needs somewhere to run, and the web app needs `NEXT_PUBLIC_API_URL` pointing at it
+- Still open: OK to write the minimal NEAR contract (assumed service-only until you say so)
+- Everything under Sessions 4 and 5 still applies for real accounts and settlement
 
 ---
 

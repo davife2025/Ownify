@@ -45,3 +45,14 @@ test("rejects bad input and unknown runs", async () => {
   assert.equal((await a.inject({ method: "GET", url: "/swarm/runs/nope" })).statusCode, 404);
   assert.equal((await a.inject({ method: "GET", url: "/swarm/runs/nope/events" })).statusCode, 404);
 });
+
+test("the run store keeps only the most recent 50 runs", async () => {
+  const { RunStore } = await import("./runs");
+  const { runSimulation } = await import("./simulation");
+  const store = new RunStore();
+  const small = runSimulation({ seed: 1, rounds: 1, buyers: 2, sellers: 2, parent: "swarm.testnet" });
+  for (let i = 0; i < 55; i++) store.add(small);
+  assert.equal(store.list().length, 50);
+  assert.equal(store.get("run-1"), undefined);
+  assert.ok(store.get("run-55"));
+});

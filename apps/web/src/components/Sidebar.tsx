@@ -5,8 +5,8 @@ export function Sidebar() {
     <nav className="sidebar" aria-label="Docs">
       <h2>Start</h2>
       <ul>
-        <li><a href="#start">Start here</a></li>
-        <li><a href="#docs">Docs and API</a></li>
+        <li><a href="/#start">Start here</a></li>
+        <li><a href="/#docs">Docs and API</a></li>
       </ul>
       <h2>NEAR Intents docs</h2>
       <ul>
@@ -16,9 +16,9 @@ export function Sidebar() {
       </ul>
       <h2>Ownify</h2>
       <ul>
-        <li><a href="#ownify-api">Ownify API</a></li>
+        <li><a href="/#ownify-api">Ownify API</a></li>
+        <li><a href="/live">Live rounds</a></li>
         <li><span className="soon">RULES.md (soon)</span></li>
-        <li><span className="soon">Live rounds (soon)</span></li>
       </ul>
     </nav>
   );
