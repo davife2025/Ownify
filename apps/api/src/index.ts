@@ -5,6 +5,8 @@ import { SimulatedProvisioner, TestnetProvisioner, type Provisioner } from "./ag
 import { MemoryAgentStore, SupabaseAgentStore, type AgentStore } from "./agents/store";
 import { createLlm } from "./shelf/factory";
 import { FileScoreStore } from "./shelf/store";
+import { FileReceiptStore } from "./shelf/receiptStore";
+import { rateCardFromEnv } from "./shelf/rates";
 
 function createProvisioner(): Provisioner {
   if (env.PROVISION_MODE === "testnet") {
@@ -46,7 +48,13 @@ async function main() {
           ? { chain: env.SELLER_PAYOUT_CHAIN, address: env.SELLER_PAYOUT_ADDRESS }
           : undefined,
     },
-    shelf: { llm: createLlm(env), scores: new FileScoreStore(env.SCORES_FILE), askLimitPerHour: env.ASK_LIMIT_PER_HOUR },
+    shelf: {
+      llm: createLlm(env),
+      scores: new FileScoreStore(env.SCORES_FILE),
+      askLimitPerHour: env.ASK_LIMIT_PER_HOUR,
+      rates: rateCardFromEnv(env),
+      receipts: new FileReceiptStore(env.RECEIPTS_FILE),
+    },
     logger: true,
   });
   await app.listen({ port: env.PORT, host: "0.0.0.0" });

@@ -5,6 +5,9 @@ import { reduceRoundEvents, shortId, usd } from "@ownify/shared";
 import { runSimulation } from "../../api/src/swarm/simulation";
 import { RoundPanels } from "../src/components/live/RoundPanels";
 import { ShelfCards } from "../src/components/shelf/ShelfCards";
+import { CostDial } from "../src/components/shelf/CostDial";
+import { ReceiptCard } from "../src/components/shelf/ReceiptCard";
+import { DEFAULT_RATE_CARD, type PricingResponse, type TaskReceipt } from "@ownify/shared";
 import { TIERS, TIER_IDS, type ShelfResponse, type TierScore } from "@ownify/shared";
 
 const run = runSimulation({ seed: 1, rounds: 3, buyers: 20, sellers: 5, parent: "swarm.testnet" });
@@ -51,4 +54,31 @@ for (const must of ["Not scored yet", "Sample only (mock model)", "Verified", "N
 }
 assert.equal(/undefined|NaN|\[object/.test(shelfHtml), false);
 
-console.log(`ssr-check ok: round 2 cleared at ${usd(res.price)}/h by ${shortId(res.winner)}, ${res.allocations.length} buyers, ${full.length} bytes of markup, shelf cards render all five statuses`);
+// Cost dial and receipt (fixtures, rendering test only).
+const tokens = { economy: 120, balanced: 125, max: 130 };
+const pricing: PricingResponse = { rates: DEFAULT_RATE_CARD, systemTokens: { housing: tokens, study: tokens, food: tokens }, energy: { measured: false } };
+const noop = () => {};
+const dial = renderToStaticMarkup(<CostDial pricing={pricing} agent="housing" question="How do I check a lease?" tier="economy" compute="cheapest" onTier={noop} onCompute={noop} />);
+for (const must of ["Economy", "Balanced", "Max", "Fastest provider", "Cheapest provider", "up to $", "reference rates, not a quote", "Energy use is not measured", "not quantified"]) {
+  assert.ok(dial.includes(must), `cost dial should include "${must}"`);
+}
+assert.equal(/undefined|NaN|\[object/.test(dial), false);
+const noAgent = renderToStaticMarkup(<CostDial pricing={pricing} agent={null} question="" tier="balanced" compute="fastest" onTier={noop} onCompute={noop} />);
+assert.ok(noAgent.includes("Pick an agent to see the price."));
+const priced = renderToStaticMarkup(<CostDial pricing={{ ...pricing, rates: { ...DEFAULT_RATE_CARD, cheapest: { inputPerMTok: 0.5, outputPerMTok: 1.5 } } }} agent="food" question="x" tier="max" compute="cheapest" onTier={noop} onCompute={noop} />);
+assert.equal(priced.includes("not quantified"), false);
+
+const receipt: TaskReceipt = {
+  v: 1, id: "abcdef0123456789", at: "2026-11-13T00:00:00Z", agent: "food", tier: "economy", compute: "cheapest", provider: "huggingface", real: true,
+  modelRequested: "moonshotai/Kimi-K2-Instruct:cheapest", modelServed: "moonshotai/Kimi-K2-Instruct", promptHash: "p".repeat(64), questionHash: "q".repeat(64),
+  inputTokens: 200, outputTokens: 100, tokensSource: "reported", latencyMs: 1500, rates: { inputPerMTok: 1, outputPerMTok: 3 }, rateSource: "reference", costUsd: 0.0005, receiptHash: "abcdef0123456789".padEnd(64, "0"),
+};
+const rc = renderToStaticMarkup(<ReceiptCard receipt={receipt} apiUrl="http://localhost:4000" />);
+for (const must of ["Receipt abcdef0123456789", "$0.0005", "200 in, 100 out", "1.5 s", "reported by the model provider", "no question or answer text", "http://localhost:4000/receipts/abcdef0123456789", "Cheapest provider"]) {
+  assert.ok(rc.includes(must), `receipt card should include "${must}"`);
+}
+assert.equal(rc.includes("placeholders"), false);
+assert.ok(renderToStaticMarkup(<ReceiptCard receipt={{ ...receipt, real: false, tokensSource: "estimated" }} apiUrl="x" />).includes("placeholders"));
+assert.equal(/undefined|NaN|\[object/.test(rc), false);
+
+console.log(`ssr-check ok: round 2 cleared at ${usd(res.price)}/h by ${shortId(res.winner)}, ${res.allocations.length} buyers, ${full.length} bytes of markup, shelf cards, cost dial and receipt card render`);

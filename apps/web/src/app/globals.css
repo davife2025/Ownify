@@ -121,3 +121,12 @@ tfoot th,tfoot td{font-weight:700;border-bottom:0}
 .wide-field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit;resize:vertical}
 .answer-box{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
 .answer{white-space:pre-wrap;margin:0 0 8px}
+
+/* cost dial and receipt */
+.dial{display:grid;gap:4px;margin-bottom:16px}
+.dial-note{margin:4px 0 0;font-size:.875rem}
+.estimate{margin:8px 0 0;font-size:1.0625rem}
+.receipt{margin-top:16px}
+.receipt h3{margin:0 0 8px}
+.receipt .facts{margin-bottom:12px}
+.receipt a{color:var(--accent)}

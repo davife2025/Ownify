@@ -1,4 +1,6 @@
 // Agent shelf types shared by the API and the web app.
+import type { ComputeId, RateCard, Rates } from "./pricing";
+
 export const TIER_IDS = ["economy", "balanced", "max"] as const;
 export type TierId = (typeof TIER_IDS)[number];
 
@@ -43,12 +45,45 @@ export interface ShelfAgent {
 
 export interface ShelfResponse { provider: LlmProvider; model: string; verifiedMin: number; agents: ShelfAgent[] }
 
+/** What one answer cost and what ran. It holds no question or answer text. */
+export interface TaskReceipt {
+  v: 1;
+  id: string;
+  at: string;
+  agent: AgentDomain;
+  tier: TierId;
+  compute: ComputeId;
+  provider: LlmProvider;
+  real: boolean;
+  modelRequested: string;
+  modelServed: string;
+  promptHash: string;
+  questionHash: string;
+  inputTokens: number;
+  outputTokens: number;
+  tokensSource: "reported" | "estimated";
+  latencyMs: number;
+  rates: Rates;
+  rateSource: "reference" | "configured";
+  costUsd: number;
+  receiptHash: string;
+}
+
 export interface AskResponse {
   agent: AgentDomain;
   tier: TierId;
+  compute: ComputeId;
   answer: string;
   provider: LlmProvider;
   model: string;
   real: boolean;
   promptHash: string;
+  receipt: TaskReceipt;
+}
+
+export interface PricingResponse {
+  rates: RateCard;
+  /** Rough token count of each agent's system prompt per tier, for live price estimates. */
+  systemTokens: Record<AgentDomain, Record<TierId, number>>;
+  energy: { measured: false };
 }

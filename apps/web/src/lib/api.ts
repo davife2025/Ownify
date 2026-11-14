@@ -1,4 +1,4 @@
-import type { AskResponse, RunDetail, RunSummary, ShelfResponse, SwarmEvent, TierId } from "@ownify/shared";
+import type { AskResponse, ComputeId, PricingResponse, RunDetail, RunSummary, ShelfResponse, SwarmEvent, TierId } from "@ownify/shared";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -34,5 +34,6 @@ export async function getAllEvents(runId: string): Promise<SwarmEvent[]> {
 }
 
 export const getShelf = () => request<ShelfResponse>("/shelf");
-export const askAgent = (agentId: string, question: string, tier: TierId) =>
-  request<AskResponse>(`/shelf/${agentId}/ask`, { question, tier });
+export const getPricing = () => request<PricingResponse>("/pricing");
+export const askAgent = (agentId: string, question: string, tier: TierId, compute: ComputeId) =>
+  request<AskResponse>(`/shelf/${agentId}/ask`, { question, tier, compute });

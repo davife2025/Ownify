@@ -2,11 +2,14 @@
   "name": "ownify",
   "private": true,
   "packageManager": "pnpm@9.15.9",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "postinstall": "pnpm --filter @ownify/shared build"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

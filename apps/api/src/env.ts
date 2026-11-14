@@ -29,6 +29,11 @@ const schema = z.object({
   HF_BASE_URL: z.preprocess(blank, z.string().url().default("https://router.huggingface.co/v1")),
   SCORES_FILE: z.preprocess(blank, z.string().default("data/shelf-scores.json")),
   ASK_LIMIT_PER_HOUR: z.preprocess(blank, z.coerce.number().int().min(1).default(60)),
+  RECEIPTS_FILE: z.preprocess(blank, z.string().default("data/receipts.json")),
+  PRICE_INPUT_USD_PER_MTOK: z.preprocess(blank, z.coerce.number().positive().optional()),
+  PRICE_OUTPUT_USD_PER_MTOK: z.preprocess(blank, z.coerce.number().positive().optional()),
+  PRICE_CHEAPEST_INPUT_USD_PER_MTOK: z.preprocess(blank, z.coerce.number().positive().optional()),
+  PRICE_CHEAPEST_OUTPUT_USD_PER_MTOK: z.preprocess(blank, z.coerce.number().positive().optional()),
 });
 
 export const env = schema.parse(process.env);

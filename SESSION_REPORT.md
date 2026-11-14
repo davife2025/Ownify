@@ -13,6 +13,48 @@
 
 ---
 
+# Session 8: Cost dial and receipts
+
+**Overview:** before asking an agent a question you can step the cost down and see a live price ceiling; every answer comes with a receipt of what ran and what it cost. Also fixes the `pnpm dev` error you reported.
+
+## Fix: `Can't resolve '@ownify/shared'` under `pnpm dev`
+- **Cause:** `@ownify/shared` points at its `dist/` folder, which only exists after a build. A fresh checkout (or my zips, which leave out `dist`) has none, and `pnpm dev` started the web app, the API and the shared watcher all at once, so the web app compiled first and failed. I reproduced the same 500 and error by starting `next dev` without a shared build. I had only tested built servers and had never run dev mode, which my earlier reports said.
+- **Fix:** the `dev` task now depends on the shared package's build, and `pnpm install` builds it too (postinstall).
+- **Verified:** from a clean state (no `dist`, no `.next`, no turbo cache), `pnpm dev` served `/`, `/live` and `/agents` with 200 in about 6 seconds, with no module errors in the log, and the API answered. A fresh `pnpm install` leaves `packages/shared/dist` in place.
+- If the error sticks on your machine: run `pnpm install`, delete `apps/web/.next`, and start again with `pnpm dev` from the repo root.
+
+## Built
+- `packages/shared`: price and token math (`quote`, `costUsd`, `ratesFor`), the receipt type, and `usdFine`
+- API: `GET /pricing`; `POST /shelf/:agent/ask` now takes `compute` (fastest or cheapest) and returns a receipt; `GET /receipts/:id` (also says whether the receipt still matches its hash) and `GET /receipts`; a file store keeping the latest 200 receipts
+- The Hugging Face client adds `:cheapest` to the model id for the cheapest setting (Hugging Face's docs: default is the fastest provider, `:cheapest` is the lowest price per output token) and reads the provider's reported token usage when present
+- Receipts hold tokens (reported or estimated, labelled), cost, time, model requested and served, prompt and question hashes. They never hold the question or answer text.
+- Web: the ask form has a cost dial (answer budget with a price ceiling beside each option, provider choice, a live estimate, the rates used, and a note that energy is not measured) and a receipt card after each answer
+- `.env.example` has the `PRICE_*` and `RECEIPTS_FILE` settings
+
+## Verified (run in this session)
+- `pnpm build` 3 of 3, `pnpm typecheck` 4 of 4, 56 of 56 API tests (9 new)
+- Stepping the answer budget down lowers the price ceiling; token and cost math; half-set price pairs are ignored; tampering with any receipt field is detected; receipts contain neither question nor answer text; the Hugging Face request carries the `:cheapest` suffix only when asked
+- Server render of the cost dial and receipt card, including the "not quantified" note when no cheaper rates are set
+- Under `pnpm dev`: `/pricing`, an ask with the cheapest setting (mock model), fetching that receipt (it matched its hash), and the receipt list all worked
+
+## Not verified, and limits
+- **The real Hugging Face API has still never been called.** Reading `usage` from its reply and the `:cheapest` suffix are tested against fakes and Hugging Face's documentation only.
+- **Prices are not real until you set them.** The reference rates ($1 input and $3 output per million tokens) came from a third-party page and are not verified. Receipt costs are tokens times these rates, not Hugging Face billing. The cheaper provider's price is unknown unless you set `PRICE_CHEAPEST_*`; until then the estimate shows the standard rates and says so.
+- **Energy is not measured and there is no energy setting.** The pitch cannot claim users can step energy down unless you supply a source or an assumption, or drop it.
+- The model setting is the answer budget (same model), as the Kimi-K2-only rule requires. The compute setting is the provider choice, fastest or cheapest; the router's other options (`:preferred`, a named provider) are not offered.
+- The price on screen is a ceiling: the model may answer in fewer tokens than the budget
+- A hash of a short question can be guessed, so treat receipts as semi-private
+- The page was server-rendered but never opened in a browser
+
+## Needed from Dave
+- Your real token prices (from Hugging Face billing or the provider) for the `PRICE_*` settings
+- A Hugging Face token, still, for real answers, reported token counts and scores
+- A decision on the energy claim: supply a source or assumption, or remove it from the pitch
+- Whether to build the data vault (Session 9) or go straight to the submission pack (Session 10)
+- After unpacking this zip, run `pnpm install`
+
+---
+
 # Session 7: Verified agent shelf
 
 **Overview:** housing, study and food agents, a scoring pipeline that tests each one on questions with known answers at three cost tiers, a receipt for every score, and a shelf page where people can ask an agent a question. Rules are written up in `VERIFICATION.md`.

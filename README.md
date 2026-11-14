@@ -4,7 +4,7 @@ Verified AI agents you own: you choose what they run on, what each task costs, a
 
 ## Status
 
-Sessions 1 (core infrastructure), 2 (landing and onboarding) 4 (agent identity) and 5 (coordinator and simulation), 6 (live dashboard) and 7 (agent shelf) are done; Session 3 (RULES.md) is a draft awaiting review. The agent shelf, cost dial, swarm rounds and data vault are not built yet; see `SESSION_REPORT.md` for what exists and what comes next.
+Sessions 1 (core infrastructure), 2 (landing and onboarding) 4 (agent identity) and 5 (coordinator and simulation), 6 (live dashboard) and 7 (agent shelf) and 8 (cost dial and receipts) are done; Session 3 (RULES.md) is a draft awaiting review. The agent shelf, cost dial, swarm rounds and data vault are not built yet; see `SESSION_REPORT.md` for what exists and what comes next.
 
 ## Stack
 
@@ -36,6 +36,22 @@ pnpm --filter @ownify/api verify --agent all --tier all           # needs HF_TOK
 pnpm --filter @ownify/api test
 pnpm --filter @ownify/web check:ssr                              # renders the dashboard panels from a real simulation
 ```
+
+## Cost dial and receipts
+
+On `/agents`, before asking an agent a question you can step the cost down two ways, and see a price ceiling update live:
+
+- **Answer budget** (Economy, Balanced, Max): the same model with a smaller or larger answer limit (250, 600 or 1200 tokens), so it really changes how many tokens you pay for.
+- **Provider**: Fastest (Hugging Face's default) or Cheapest. Cheapest adds `:cheapest` to the model id, which Hugging Face documents as picking the provider with the lowest price per output token.
+
+Every answer returns a receipt: tokens in and out (as reported by the provider, or estimated and labelled), cost, time, the model requested and served, and hashes of the prompt and question. Receipts hold no question or answer text, and `GET /receipts/:id` says whether a receipt still matches its hash.
+
+What this does not do: prices come from the `PRICE_*` settings (reference rates until you set them), not from Hugging Face billing, and energy use is not measured, so there is no energy setting.
+
+## Troubleshooting
+
+- `Module not found: Can't resolve '@ownify/shared'`: the shared package must be built before the apps start. `pnpm install` now does this, and `pnpm dev` builds it first. If you run an app on its own, run `pnpm --filter @ownify/shared build` first, and delete `apps/web/.next` if the error sticks.
+- After unpacking a newer zip, run `pnpm install` again.
 
 ## Notes
 
